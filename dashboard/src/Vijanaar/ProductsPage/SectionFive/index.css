@@ -1,0 +1,73 @@
+.section-five-container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: "Nunito Sans", sans-serif;
+}
+
+.section-five-main-head {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #4F5077;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.section-five-error-container {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.section-five-error-container img {
+  width: 150px;
+  margin-bottom: 15px;
+}
+
+.section-five-error-container button {
+  background-color: #e53e3e;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+/* Training editor */
+.trainings-editor {
+  margin-top: 20px;
+}
+
+.trainings-editor h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #4F5077;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.trainings-editor .MuiTextField-root {
+  margin-bottom: 12px;
+}
+
+.save-btn {
+  background-color: #2563eb;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  margin-top: 15px;
+  display: inline-block; /* prevents full width */
+  width: auto; /* adjusts to content size */
+}
+
+.save-btn:hover {
+  background-color: #1d4ed8; /* slightly darker on hover */
+}
+
+/* Optional: add spacing between buttons and editors */
+.trainings-editor .ck-editor {
+  margin-bottom: 15px;
+}
+

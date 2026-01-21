@@ -1,0 +1,105 @@
+/* Container for the page */
+.products-page-container {
+
+  margin: 0 auto;
+  padding: 20px;
+  font-family: "Nunito Sans", sans-serif;
+}
+
+/* Main heading */
+.products-section-three-main-head {
+  font-size: 1.875rem; /* 30px */
+  font-weight: 700;
+  color: #4F5077; /* Section heading color */
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Section Two heading */
+.products-page-container h2 {
+  font-size: 1.5rem; /* 24px */
+  font-weight: 600;
+  color: #4F5077;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+/* Label styling */
+.products-page-container label {
+  display: block;
+  font-weight: 500;
+  color: #7D8592; /* Label color */
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+}
+
+/* Input fields */
+.products-page-container input,
+.products-page-container textarea {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  color: #333;
+  margin-bottom: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.products-page-container input:focus,
+.products-page-container textarea:focus {
+  border-color: #4F5077;
+}
+
+/* Buttons */
+.products-page-container button {
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.products-page-container button:hover {
+  opacity: 0.9;
+}
+
+/* Dropdown (if you want some extra Tailwind-like style for MUI select container) */
+.MuiFormControl-root {
+  margin-bottom: 16px;
+}
+
+/* Error message container */
+.products-page-error-message-container {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.products-page-error-message-container img {
+  width: 150px;
+  margin-bottom: 15px;
+}
+
+.products-page-error-message-container button {
+  background-color: #e53e3e;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+}
+
+/* Optional: spacing for textarea rows */
+.products-page-container textarea {
+  resize: vertical;
+}
+
+/* Optional: make MUI select label match your font */
+.MuiInputLabel-root {
+  font-size: 0.95rem;
+  color: #7D8592;
+}
+
+/* Optional: change selected value font color */
+.MuiSelect-select {
+  color: #333;
+  font-size: 0.95rem;
+}

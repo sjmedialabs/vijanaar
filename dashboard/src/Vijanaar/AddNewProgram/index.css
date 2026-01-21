@@ -1,0 +1,91 @@
+/* ====== Admin Course Form Styles ====== */
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+.section-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  border: 1px solid #e5e7eb;
+}
+
+.section-header {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #1f2937;
+}
+
+.section-card input,
+.section-card textarea {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.section-card input:focus,
+.section-card textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+}
+
+.section-card button {
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.section-card button:hover {
+  transform: translateY(-1px);
+}
+
+.section-card button:active {
+  transform: translateY(0);
+}
+
+/* Action Buttons */
+button.bg-blue-500,
+button.bg-red-500,
+button.bg-green-600 {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+button.bg-blue-500 {
+  background-color: #3b82f6;
+}
+
+button.bg-red-500 {
+  background-color: #ef4444;
+}
+
+button.bg-green-600 {
+  background-color: #16a34a;
+}
+
+/* Flex utilities inside form */
+.flex {
+  display: flex;
+}
+
+.gap-2 {
+  gap: 8px;
+}
+
+.items-start {
+  align-items: flex-start;
+}
+
+/* Ensure RichTextEditor doesn’t overflow */
+.ck-editor__editable {
+  min-height: 120px;
+  max-height: 250px;
+  overflow-y: auto;
+  border-radius: 6px !important;
+}

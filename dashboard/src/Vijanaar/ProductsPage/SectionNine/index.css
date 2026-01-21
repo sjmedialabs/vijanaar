@@ -1,0 +1,95 @@
+.courses-section-nine {
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #4f5077;
+}
+
+.course-dropdown {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+}
+
+.loading-text {
+  text-align: center;
+  color: #888;
+}
+
+.section-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.input-field {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin-top: 0.3rem;
+}
+
+.jobs-list {
+  margin-top: 1rem;
+}
+
+.job-card {
+  background: #f9f9f9;
+  padding: 0.8rem;
+  border-radius: 6px;
+  margin-bottom: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.add-btn,
+.remove-btn,
+.update-button {
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+.add-btn {
+  background: #4caf50;
+  color: white;
+}
+
+.add-btn:hover {
+  background: #43a047;
+}
+
+.remove-btn {
+  background: #e53935;
+  color: white;
+  align-self: flex-start;
+}
+
+.remove-btn:hover {
+  background: #c62828;
+}
+
+.update-button {
+  margin-top: 1.5rem;
+  background: #4f5077;
+  color: white;
+}
+
+.update-button:hover {
+  background: #3d3e5d;
+}

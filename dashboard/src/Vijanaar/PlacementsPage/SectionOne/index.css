@@ -1,0 +1,18 @@
+.home-page-section1-heading{
+    font-family: 'Roboto';
+    font-size: 25px;
+    font-weight: 400;
+    color:'#000000';
+    text-align: center;
+}
+.update-button-styling{
+    height: 40px;
+    width: 90px;
+    background-color: blue;
+    border-width: 0px;
+    border-radius: 6px;
+    font-family: 'Roboto';
+    font-size: 16px;
+    font-weight: 400;
+    color:#ffffff;
+}

@@ -1,0 +1,29 @@
+.about-page-section3-heading{
+   font-family: 'Roboto';
+    font-size: 30px;
+    font-weight: 400;
+    color:#000000;
+    text-align: center;
+}
+.update-button-about-section-3-styling{
+    height: 40px;
+    width: 90px;
+    background-color: blue;
+    border-width: 0px;
+    border-radius: 6px;
+    font-family: 'Roboto';
+    font-size: 16px;
+    font-weight: 400;
+    color:#ffffff;
+    margin-top: 20px;
+}
+.error-message-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.server-error-image{
+    width: 300px;
+    height: 300px;
+}

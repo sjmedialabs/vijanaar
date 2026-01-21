@@ -1,0 +1,64 @@
+.testimonial-banner-editor {
+  padding: 20px;
+  background: #f9fafc;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  width: 100%;       /* Full width */
+  max-width: 100%;   /* Remove any max-width restriction */
+  margin: 20px 0;    /* Adjusted margin for full-width layout */
+  box-sizing: border-box; /* Ensure padding doesn't overflow */
+}
+
+.editor-heading {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.editor-textarea {
+  width: 100%;
+  min-height: 100px;
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  resize: vertical;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.image-preview {
+  margin: 15px 0;
+  text-align: center;
+}
+
+.image-preview img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+.update-banner-btn {
+  background: #007bff;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.update-banner-btn:hover {
+  background: #0056b3;
+  transform: translateY(-2px);
+}
+
+.update-banner-btn:disabled {
+  background: #999;
+  cursor: not-allowed;
+}

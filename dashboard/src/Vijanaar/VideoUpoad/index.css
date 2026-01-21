@@ -1,0 +1,64 @@
+/* Container for upload input */
+.input-file-container {
+    border:0px;
+    background-color: black;
+    height: 40px;
+    width: 140px;
+    border-radius: 25px;
+    cursor: pointer;
+}
+
+.input-file-container:hover {
+    border-color: #007bff;
+    background-color: rgb(53, 50, 50);
+}
+.video-upload-container{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding-top: 10px;
+}
+
+/* Upload text styling */
+.input-field-text-styling {
+    font-family: "poppins",sans-serif;
+    font-size: 14px;
+    margin-left: 8px;
+    font-weight: 400;
+    color:#ffffff;
+}
+
+/* Uploaded video preview section */
+.video-preview-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.video-preview-container p {
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.video-preview {
+    max-width: 300px;
+    max-height: 200px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+/* Error & loading feedback */
+.upload-error-message {
+    color: red;
+    font-family: 'Roboto', sans-serif;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.upload-loading-spinner {
+    margin-top: 8px;
+}

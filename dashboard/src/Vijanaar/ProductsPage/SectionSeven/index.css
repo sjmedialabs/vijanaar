@@ -1,0 +1,80 @@
+.courses-section-seven {
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: "Nunito Sans", sans-serif;
+  color: #4f5077;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.course-dropdown {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.loading-text {
+  font-size: 1rem;
+  color: #7d8592;
+}
+
+.tools-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.tools-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.tool-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.tool-input,
+.tool-textarea {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-top: 0.3rem;
+  font-family: "Nunito Sans", sans-serif;
+}
+
+.tool-textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.update-button {
+  margin-top: 1rem;
+  padding: 0.7rem 1.5rem;
+  background-color: #4f5077;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.update-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

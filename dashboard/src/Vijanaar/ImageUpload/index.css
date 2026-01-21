@@ -1,0 +1,32 @@
+.input-file-container-image{
+   
+    border:0px;
+    background-color: black;
+    height: 40px;
+    width: 140px;
+    border-radius: 25px;
+    cursor: pointer;
+}
+.input-file-container-image:hover{
+    background-color: rgb(62, 61, 61);
+}
+.input-field-text-styling-image{
+    font-family: "poppins",sans-serif;
+    font-size: 14px;
+    margin-left: 8px;
+    font-weight: 400;
+    color:#ffffff;
+}
+.image-upload-container{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding-top: 10px;
+}
+@media(max-width:992px){
+    .input-file-container{
+        width: 100%;
+        
+    }
+}

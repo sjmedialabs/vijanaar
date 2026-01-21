@@ -1,0 +1,98 @@
+/* 🔹 Section Heading */
+.admin-section-heading {
+  font-family: 'Roboto', sans-serif;
+  font-size: 28px;
+  font-weight: 500;
+  color: #000000;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+/* 🔹 Update Button */
+.products-update-button-about-section-4-styling {
+  height: 40px;
+  width: 100px;
+  background-color: #2563eb; /* Tailwind blue-600 */
+  border: none;
+  border-radius: 6px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #ffffff;
+  margin-top: 20px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.products-update-button-about-section-4-styling:hover {
+  background-color: #1d4ed8; /* Darker blue on hover */
+}
+
+/* 🔹 Error State */
+.products-page-error-message-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.products-page-server-error-image {
+  width: 240px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+/* 🔹 Section Background */
+.products-section-two-admin {
+  background-color: #f9fafb;
+  padding: 40px 24px;
+  border-radius: 12px;
+}
+
+/* 🔹 Grid Layout */
+.products-section-two-admin .grid {
+  margin-top: 20px;
+}
+
+/* 🔹 Feature Cards */
+.products-section-two-admin .feature-card {
+  background: #f5f7fb;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 16px;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.products-section-two-admin .feature-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Feature Card Image */
+.products-section-two-admin .feature-card img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  margin-bottom: 12px;
+}
+
+/* Feature Card Title */
+.products-section-two-admin .feature-card p {
+  font-size: 14px;
+  font-weight: 500;
+  color: #111827;
+}
+
+/* Edit / Delete Links */
+.products-section-two-admin .feature-card button {
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.products-section-two-admin .feature-card button:hover {
+  opacity: 0.8;
+}

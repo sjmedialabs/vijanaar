@@ -1,0 +1,102 @@
+.homepage-section5 {
+  padding: 20px;
+  background: #f9fafb;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.home-page-section5-heading {
+  font-family: 'Roboto';
+  font-size: 24px;
+  font-weight: 500;
+  color: #000000;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.cards-container {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.cards-heading {
+  font-family: 'Roboto';
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.card-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.preview {
+  margin-top: 0px;
+}
+
+.preview img {
+  max-width: 180px;
+  border-radius: 6px;
+}
+
+.add-card-button {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.add-card-button:hover {
+  background-color: #1e40af;
+}
+
+.delete-card-button {
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.delete-card-button:hover {
+  background-color: #b91c1c;
+}
+
+.btn-container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.update-button-styling-section5 {
+  height: 40px;
+  width: 100px;
+  background-color: #16a34a;
+  border-width: 0px;
+  border-radius: 6px;
+  font-family: 'Roboto';
+  font-size: 16px;
+  font-weight: 500;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.update-button-styling-section5:hover {
+  background-color: #15803d;
+}

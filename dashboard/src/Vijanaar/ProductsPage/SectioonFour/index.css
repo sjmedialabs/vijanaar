@@ -1,0 +1,110 @@
+.section-four-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: "Nunito Sans", sans-serif;
+}
+
+/* Main heading */
+.section-four-main-head {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #4F5077;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Error container */
+.section-four-error-container {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.section-four-error-container img {
+  width: 150px;
+  margin-bottom: 15px;
+}
+
+.section-four-error-container button {
+  background-color: #ef4444;
+  color: white;
+  padding: 8px 14px;
+  font-family: "poppins",sans-serif;
+  font-weight: 400;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+/* Curriculum editor */
+.curriculum-editor {
+  margin-top: 20px;
+}
+
+/* Section card */
+.curriculum-section {
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 20px;
+  background-color: #f5f7fb;
+}
+
+/* Section header */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Buttons */
+.add-section-btn{
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  background-color: green;
+}
+
+.add-section-btn,
+.add-point-btn {
+  background-color: #4f5077;
+  color: white;
+}
+
+.save-btn {
+  background-color: #55c843;
+  color: white;
+  display: block;
+  margin-top: 20px;
+}
+
+.delete-btn {
+  background-color: #e53e3e;
+  color: white;
+  padding: 12px 12px;
+}
+
+.add-section-btn:hover,
+.add-point-btn:hover,
+.save-btn:hover,
+.delete-btn:hover {
+  opacity: 0.9;
+}
+
+/* Points list spacing */
+.points-list {
+  margin-left: 10px;
+  margin-top: 10px;
+}
+
+/* Individual point item spacing */
+.point-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
