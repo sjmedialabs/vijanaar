@@ -166,25 +166,28 @@ export default function CourseDetailPage() {
   const toggleModule = (index: number) => {
     setExpandedModule(expandedModule === index ? null : index)
   }
-
+  const isYouTube = (url:String) => url?.includes("youtube.com") || url?.includes("youtu.be");
   return (
     <main className="min-h-screen bg-white">
       <Header />
 
       {/* Banner Section */}
       <section
-        className="relative py-16 -mr-20 md:-mr-12 bg-right bg-no-repeat h-[850px] md:h-[760px]"
+        className="relative py-0 md:py-16  md:-mr-12 bg-right bg-no-repeat h-[300px] md:h-[560px] mobile-tall-banne"
         style={{
-          backgroundImage: `url(${course.bannerSection.backgroundImageUrl})`
+          backgroundImage: `url(${course.bannerSection.backgroundImageUrl})`,
+          backgroundPosition:"end",
+          backgroundSize:"contain",
+          
         }}
       >
         <div className=" max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-0">
-          <div className="flex items-center absolute top-1/4">
+          <div className="flex items-center absolute mt-[80px] md:mt-[40px]">
             {/* Left Content */}
             <div className="">
                 <div className="w-80 lg:w-150">
               <h1
-                className="font-bold mb-6 leading-tight lg:text-[42px] text-[30px]"
+                className="font-bold mb-6 leading-tight text-[20px] lg:text-[42px]"
                 style={{
                   color: "#27AAE1",
                   fontFamily: "Poppins, sans-serif",
@@ -196,7 +199,7 @@ export default function CourseDetailPage() {
                 {course.bannerSection.title}
               </h1>
               <p
-                className="mb-8 leading-relaxed lg:text-[22px] text-[18px]"
+                className="mb-8 hidden md:block leading-relaxed text-[16px] lg:text-[22px] "
                 style={{
                   color: "#000",
                   fontFamily: "Poppins, sans-serif",
@@ -209,26 +212,26 @@ export default function CourseDetailPage() {
               {/* Course Stats */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-12">
                 <div className="flex items-center gap-3 mb-6">
-                  <img src="/images/solar-calendar-outline.png" alt="Calendar" className="w-14 h-14" />
+                  <img src="/images/solar-calendar-outline.png" alt="Calendar" className="w-10 h-10 md:w-14 md:h-14" />
                   <div>
-                    <p className="text-lg font-semibold text-gray-900">Programme Starts</p>
-                    <p className="text-lg font-bold text-gray-900">{course.bannerSection.startDate}</p>
+                    <p className="text-sm md:text-lg font-semibold text-gray-900">Programme Starts</p>
+                    <p className="text-sm md:text-lg font-bold text-gray-900">{course.bannerSection.startDate}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 mb-6">
-                  <img src="/images/mingcute-time-duration-line.png" alt="Duration" className="w-14 h-14" />
+                <div className="hidden md:flex items-center gap-3 mb-6">
+                  <img src="/images/mingcute-time-duration-line.png" alt="Duration" className="w-10 h-10 md:w-14 md:h-14" />
                   <div>
-                    <p className="text-lg font-semibold text-gray-900">Duration</p>
-                    <p className="text-lg font-bold text-gray-900">{course.bannerSection.duration}</p>
+                    <p className="text-sm md:text-lg font-semibold text-gray-900">Duration</p>
+                    <p className="text-sm md:text-lg font-bold text-gray-900">{course.bannerSection.duration}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <img src="/images/ri-money-rupee-circle-fill.png" alt="Fees" className="w-14 h-14" />
+                  <img src="/images/ri-money-rupee-circle-fill.png" alt="Fees" className="w-10 h-10 md:w-14 md:h-14" />
                   <div>
-                    <p className="text-lg font-semibold text-gray-900">Programme Fees</p>
-                    <p className="text-lg font-bold text-gray-900">₹{course.bannerSection.courseFee} + GST</p>
+                    <p className="text-sm md:text-lg font-semibold text-gray-900">Programme Fees</p>
+                    <p className="text-sm md:text-lg font-bold text-gray-900">₹{course.bannerSection.courseFee} + GST</p>
                   </div>
                 </div>
 
@@ -444,19 +447,19 @@ export default function CourseDetailPage() {
   <Card className="border border-gray-200">
     <CardContent className="p-6">
       {/* Tabs */}
-      <div className="flex flex-wrap gap-8 mb-6 border-b border-gray-200">
+      <div className="flex gap-8  mb-6 border-b border-gray-200">
         {["Online Training", "Self-Paced Training", "Classroom Training", "Corporate Training"].map(
           (tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`pb-3 border-b-2 transition-colors ${
+              className={`pb-3 border-b-2 transition-colors text-[10px] md:text-[14px] ${
                 activeTab === tab ? "border-blue-400" : "border-transparent"
               }`}
               style={{
                 fontFamily: "Poppins, sans-serif",
                 fontWeight: 400,
-                fontSize: "14px",
+                
                 color: activeTab === tab ? "#42B5E5" : "#000",
               }}
             >
@@ -699,19 +702,30 @@ export default function CourseDetailPage() {
       {course.videoSection?.videoUrl && (
         <section className="py-16 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="relative cursor-pointer" onClick={() => setShowVideoPopup(true)}>
-              <video
-                src={course.videoSection.videoUrl}
-                controls
-                className="w-full h-120 rounded-lg shadow-lg hover:shadow-xl transition-shadow"
-              />
+            <div className="relative w-full aspect-video rounded-lg shadow-lg md:h-[60vh] lg:h-[80vh] xl:h-[80vh]">
+              {isYouTube(course.videoSection.videoUrl) ? (
+                <iframe
+                  src={course.videoSection.videoUrl}
+                  title="Course Video"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="w-full h-full rounded-lg"
+                ></iframe>
+              ) : (
+                <video
+                  src={course.videoSection.videoUrl}
+                  controls
+                  className="w-full h-full rounded-lg"
+                />
+              )}
             </div>
           </div>
         </section>
       )}
 
         {/* Who Can Enroll Section */}
-        <section className="py-16">
+        <section className="py-6">
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     {/* Enroll Section */}
     <div className="mb-12">
@@ -816,10 +830,8 @@ export default function CourseDetailPage() {
   </div>
         </section>
 
-
-
       {/* Key Highlights Section */}
-     <section className="py-16 bg-white">
+     <section className="bg-white pb-10">
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-0">
     <h2
       className="text-center mb-12"
@@ -851,7 +863,7 @@ export default function CourseDetailPage() {
       ))}
     </div>
   </div>
-</section>
+     </section>
 
 
       <Footer />
