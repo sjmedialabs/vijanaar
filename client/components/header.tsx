@@ -192,10 +192,6 @@ export default function Header() {
                   <ChevronDownIcon />
                 </button>
                 </Link>
-<<<<<<< HEAD
-
-=======
->>>>>>> 69088885e4dead27ae564b9e67a77e60e65bf043
                 {isMobileDropdownOpen && (
                   <div className="mt-2 bg-white border border-gray-200 rounded-lg shadow-lg w-[60%]">
                     <div className="py-2">

@@ -437,26 +437,6 @@ var settings = {
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-<<<<<<< HEAD
-              {courseData?.map((course, idx) => (
-              <div
-  key={idx}
-  className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden flex flex-col h-full"
->
-  {/* Course Banner */}
-  <div className="relative">
-    <img
-      src={course.bannerSection.imageUrl}
-      alt={course.bannerSection.courseName}
-      className="w-full h-48 object-cover"
-    />
-    <div className="absolute top-4 left-4">
-      <span className="bg-[#FFB800] text-white px-3 py-1 rounded-full text-sm font-medium">
-        Trending
-      </span>
-    </div>
-  </div>
-=======
               {courseData?.slice(0, 4).map((course, idx) => (
                 <div
                   key={idx}
@@ -475,7 +455,6 @@ var settings = {
                       </span>
                     </div>
                   </div>
->>>>>>> 69088885e4dead27ae564b9e67a77e60e65bf043
 
   {/* Course Content */}
   <div className="p-6 flex flex-col flex-1">
@@ -623,11 +602,7 @@ var settings = {
         {/* View All Stories */}
         <div className="text-center mt-6">
           <a
-<<<<<<< HEAD
-            href="/testimonial"
-=======
             href="/placements"
->>>>>>> 69088885e4dead27ae564b9e67a77e60e65bf043
             className="text-[#1A4886] font-semibold text-sm underline"
           >
             View All Stories

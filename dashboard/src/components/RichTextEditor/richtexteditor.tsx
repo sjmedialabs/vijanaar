@@ -8,7 +8,7 @@ interface RichTextEditorProps {
   charLimit?: number; // Optional character limit
   placeholder?: string;
   toolbarItems?: string[];
-  disabled?: boolean; // ✅ added disabled prop
+  disabled?: boolean;
 }
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({
@@ -16,8 +16,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   onChange,
   charLimit = 150,
   placeholder,
-  toolbarItems = ["bold", "italic", "underline", "link", "bulletedList", "numberedList", "blockQuote"],
-  disabled = false, // default false
+  toolbarItems = ["bold", "italic", "link", "bulletedList", "numberedList", "blockQuote"],
+  disabled = false,
 }) => {
   const [charCount, setCharCount] = useState(0);
 
@@ -31,13 +31,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       <CKEditor
         editor={ClassicEditor as any}
         data={value}
-        disabled={disabled} // ✅ pass to CKEditor (optional fallback)
+        disabled={disabled}
         onReady={(editor: any) => {
-          // Set editor to read-only if disabled
-          editor.isReadOnly = disabled;
+          if (disabled) {
+            editor.enableReadOnlyMode("disabled-mode");
+          }
         }}
         onChange={(_, editor) => {
-          if (disabled) return; // prevent changes if disabled
+          if (disabled) return;
           let data = editor.getData();
           const textOnly = data.replace(/<[^>]*>/g, "").trim();
 

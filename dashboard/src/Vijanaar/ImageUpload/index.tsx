@@ -22,7 +22,7 @@ const ImageUploadEl: React.FC<ImageUploadElProps> = ({
   maxSizeMB = 2, // default 1MB
   gettingRemoteUrl
 }) => {
-  const { id, text, url } = data;
+  const { id } = data;
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleClick = () => {

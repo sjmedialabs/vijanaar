@@ -13,7 +13,7 @@ type VideoUploadElProps = {
 };
 
 const VideoUploadEl: React.FC<VideoUploadElProps> = ({ data, gettingRemoteUrl }) => {
-  const { id, text, urlText } = data;
+  const { id } = data;
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string>("");
 
