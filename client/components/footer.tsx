@@ -72,7 +72,7 @@ export default function Footer() {
             <div>
               <p className="text-sm text-gray-600">Contact us</p>
               <p className="text-blue-600 font-semibold text-[12px]">
-                {companyData?.sectionOne?.phone1} | {companyData?.sectionOne?.phone2}
+                {companyData?.sectionOne?.phone1} {companyData?.sectionOne?.phone2?"|":""} {companyData?.sectionOne?.phone2}
               </p>
             </div>
           </div>
@@ -194,10 +194,14 @@ export default function Footer() {
                     <Image src="/icons/phone-footer.png" alt="Phone" width={20} height={20} />
                     <p className="text-white text-sm">{companyData?.sectionOne?.phone1}</p>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  {
+                    companyData?.sectionOne?.phone2 && (
+                      <div className="flex items-center space-x-2">
                     <Image src="/icons/phone-footer.png" alt="Phone" width={20} height={20} />
                     <p className="text-white text-sm">{companyData?.sectionOne?.phone2}</p>
                   </div>
+                    )
+                  }
                   <div className="flex items-center space-x-2">
                     <Image src="/icons/email-footer.png" alt="Email" width={20} height={20} />
                     <p className="text-white text-sm">{companyData?.sectionOne?.email1}</p>
