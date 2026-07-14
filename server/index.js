@@ -124,13 +124,100 @@ app.post("/login", async (req, res) => {
 });
 
 // ---------------- Nodemailer Setup ----------------
-const transporter = nodemailer.createTransport({
-  service: 'Gmail',
-  auth: {
-    user: process.env.EMAIL_USER,       // from .env
-    pass: process.env.EMAIL_PASS        // from .env
+const resolveBool = (value, defaultValue = false) => {
+  if (value === undefined) return defaultValue;
+  if (typeof value === 'boolean') return value;
+  const v = String(value).trim().toLowerCase();
+  if (['1', 'true', 'yes', 'y', 'on'].includes(v)) return true;
+  if (['0', 'false', 'no', 'n', 'off'].includes(v)) return false;
+  return defaultValue;
+};
+
+const getMailConfig = () => {
+  // Preferred, explicit SMTP config
+  // - SMTP_URL="smtp://user:pass@smtp.gmail.com:587"
+  // - or SMTP_HOST/SMTP_PORT/SMTP_SECURE/SMTP_USER/SMTP_PASS
+  const SMTP_URL = process.env.SMTP_URL;
+  const SMTP_HOST = process.env.SMTP_HOST;
+  const SMTP_PORT = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined;
+  const SMTP_SECURE = resolveBool(process.env.SMTP_SECURE, false);
+  const SMTP_USER = process.env.SMTP_USER;
+  const SMTP_PASS = process.env.SMTP_PASS;
+
+  // Back-compat envs (current code uses these)
+  const EMAIL_USER = process.env.EMAIL_USER;
+  const EMAIL_PASS = process.env.EMAIL_PASS;
+
+  const FROM = process.env.EMAIL_FROM || process.env.EMAIL_USER || process.env.SMTP_USER;
+
+  return {
+    SMTP_URL,
+    SMTP_HOST,
+    SMTP_PORT,
+    SMTP_SECURE,
+    SMTP_USER,
+    SMTP_PASS,
+    EMAIL_USER,
+    EMAIL_PASS,
+    FROM,
+  };
+};
+
+let transporter;
+const getTransporter = () => {
+  if (transporter) return transporter;
+
+  const cfg = getMailConfig();
+
+  if (cfg.SMTP_URL) {
+    transporter = nodemailer.createTransport(cfg.SMTP_URL);
+    return transporter;
   }
-});
+
+  if (cfg.SMTP_HOST) {
+    transporter = nodemailer.createTransport({
+      host: cfg.SMTP_HOST,
+      port: cfg.SMTP_PORT || (cfg.SMTP_SECURE ? 465 : 587),
+      secure: cfg.SMTP_SECURE,
+      auth: cfg.SMTP_USER && cfg.SMTP_PASS ? { user: cfg.SMTP_USER, pass: cfg.SMTP_PASS } : undefined,
+    });
+    return transporter;
+  }
+
+  // Fallback: Gmail "service" transport (requires an App Password if 2FA is on)
+  transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: cfg.EMAIL_USER && cfg.EMAIL_PASS ? { user: cfg.EMAIL_USER, pass: cfg.EMAIL_PASS } : undefined,
+  });
+  return transporter;
+};
+
+const assertMailEnv = () => {
+  const cfg = getMailConfig();
+
+  const hasSmtpUrl = Boolean(cfg.SMTP_URL);
+  const hasSmtpParts = Boolean(cfg.SMTP_HOST && (cfg.SMTP_USER || cfg.SMTP_PASS));
+  const hasLegacy = Boolean(cfg.EMAIL_USER && cfg.EMAIL_PASS);
+
+  if (!hasSmtpUrl && !hasSmtpParts && !hasLegacy) {
+    throw new Error(
+      'Email is not configured. Set SMTP_URL or SMTP_HOST/SMTP_USER/SMTP_PASS (recommended), or EMAIL_USER/EMAIL_PASS (legacy).'
+    );
+  }
+
+  if (!cfg.FROM) {
+    throw new Error('Email is not configured. Set EMAIL_FROM (or EMAIL_USER/SMTP_USER).');
+  }
+
+  return cfg;
+};
+
+const sendMailSafe = async (mailOptions) => {
+  const cfg = assertMailEnv();
+  const tx = getTransporter();
+  const finalMail = { ...mailOptions, from: cfg.FROM };
+  return await tx.sendMail(finalMail);
+};
 // ---------------- Generate Reset Token & Send Email ----------------
 app.post('/forgot-password', async (req, res) => {
   try {
@@ -146,7 +233,7 @@ app.post('/forgot-password', async (req, res) => {
     const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: process.env.EMAIL_FROM || process.env.EMAIL_USER || process.env.SMTP_USER,
       to: username, // assuming username is email
       subject: 'Admin Dashboard Password Reset',
       html: `
@@ -161,12 +248,20 @@ app.post('/forgot-password', async (req, res) => {
       `
     };
 
-    await transporter.sendMail(mailOptions);
+    await sendMailSafe(mailOptions);
 
     res.status(200).json({ message: 'Reset link sent to your email' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    const msg = String(error?.message || '');
+    const isAuth =
+      msg.includes('EAUTH') ||
+      msg.includes('Invalid login') ||
+      msg.includes('Username and Password not accepted') ||
+      msg.includes('535');
+    res.status(500).json({
+      message: isAuth ? 'Email service authentication failed. Check SMTP credentials/app password.' : 'Server error',
+    });
   }
 });
 
@@ -799,7 +894,7 @@ app.post("/contactusform",async(req,res)=>{
     }
     try{
         const mailOptions={
-          from: process.env.EMAIL_USER,
+          from: process.env.EMAIL_FROM || process.env.EMAIL_USER || process.env.SMTP_USER,
           to: process.env.CONTACT_US_RECEIVER_EMAIL ,//where to send 
           subject:`New Contact Us Form Submission`,
           html: `
@@ -822,10 +917,21 @@ app.post("/contactusform",async(req,res)=>{
             </div>
           `
          }
-        await transporter.sendMail(mailOptions);
+        if (!process.env.CONTACT_US_RECEIVER_EMAIL) {
+          return res.status(500).json({ error: "CONTACT_US_RECEIVER_EMAIL is not configured" });
+        }
+        await sendMailSafe(mailOptions);
         return res.status(200).json({message:"Form submitted successfully"});
     }catch(err){
-       res.status(500).json({error:err.message});
+       const msg = String(err?.message || '');
+       const isAuth =
+         msg.includes('EAUTH') ||
+         msg.includes('Invalid login') ||
+         msg.includes('Username and Password not accepted') ||
+         msg.includes('535');
+       res.status(500).json({
+         error: isAuth ? 'Email service authentication failed. Check SMTP credentials/app password.' : msg,
+       });
     }
 })
 
@@ -1160,7 +1266,7 @@ app.post("/enquiryform", async (req, res) => {
 
   try {
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: process.env.EMAIL_FROM || process.env.EMAIL_USER || process.env.SMTP_USER,
       to: process.env.ENQUIRY_RECEIVER_EMAIL, // admin email for enquiries
       subject: "🎓 New Course Enquiry Submission",
       html: `
@@ -1191,11 +1297,22 @@ app.post("/enquiryform", async (req, res) => {
       `,
     };
 
-    await transporter.sendMail(mailOptions);
+    if (!process.env.ENQUIRY_RECEIVER_EMAIL) {
+      return res.status(500).json({ error: "ENQUIRY_RECEIVER_EMAIL is not configured" });
+    }
+    await sendMailSafe(mailOptions);
     return res.status(200).json({ message: "Enquiry form submitted successfully" });
   } catch (err) {
     console.error("Error sending enquiry email:", err);
-    return res.status(500).json({ error: err.message });
+    const msg = String(err?.message || '');
+    const isAuth =
+      msg.includes('EAUTH') ||
+      msg.includes('Invalid login') ||
+      msg.includes('Username and Password not accepted') ||
+      msg.includes('535');
+    return res.status(500).json({
+      error: isAuth ? 'Email service authentication failed. Check SMTP credentials/app password.' : msg,
+    });
   }
 });
 app.post("/courseenquiry", async (req, res) => {
@@ -1208,7 +1325,7 @@ app.post("/courseenquiry", async (req, res) => {
 
   try {
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: process.env.EMAIL_FROM || process.env.EMAIL_USER || process.env.SMTP_USER,
       to: process.env.ENQUIRY_RECEIVER_EMAIL, // admin email for course enquiries
       subject: "🎓 New Course Enquiry Received",
       html: `
@@ -1240,11 +1357,22 @@ app.post("/courseenquiry", async (req, res) => {
       `,
     };
 
-    await transporter.sendMail(mailOptions);
+    if (!process.env.ENQUIRY_RECEIVER_EMAIL) {
+      return res.status(500).json({ error: "ENQUIRY_RECEIVER_EMAIL is not configured" });
+    }
+    await sendMailSafe(mailOptions);
     return res.status(200).json({ message: "Course enquiry submitted successfully" });
   } catch (err) {
     console.error("Error sending course enquiry email:", err);
-    return res.status(500).json({ error: err.message });
+    const msg = String(err?.message || '');
+    const isAuth =
+      msg.includes('EAUTH') ||
+      msg.includes('Invalid login') ||
+      msg.includes('Username and Password not accepted') ||
+      msg.includes('535');
+    return res.status(500).json({
+      error: isAuth ? 'Email service authentication failed. Check SMTP credentials/app password.' : msg,
+    });
   }
 });
 
