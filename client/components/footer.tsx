@@ -61,6 +61,16 @@ export default function Footer() {
     fetchCompanyDetails()
   }, [])
 
+  if (!companyData) {
+    return (
+      <footer className="bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 py-12">
+          <div className="h-20 w-48 bg-gray-800 animate-pulse rounded" />
+        </div>
+      </footer>
+    )
+  }
+
   return (
     <>
       {/* Top Info Cards */}

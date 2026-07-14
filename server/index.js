@@ -4,7 +4,7 @@ const cors=require('cors');
 const bcrypt = require('bcrypt');  // For hashing password
 const jwt = require("jsonwebtoken");
 const crypto = require('crypto');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 require('dotenv').config();
 // require('dotenv').config();
 
@@ -123,101 +123,8 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// ---------------- Nodemailer Setup ----------------
-const resolveBool = (value, defaultValue = false) => {
-  if (value === undefined) return defaultValue;
-  if (typeof value === 'boolean') return value;
-  const v = String(value).trim().toLowerCase();
-  if (['1', 'true', 'yes', 'y', 'on'].includes(v)) return true;
-  if (['0', 'false', 'no', 'n', 'off'].includes(v)) return false;
-  return defaultValue;
-};
-
-const getMailConfig = () => {
-  // Preferred, explicit SMTP config
-  // - SMTP_URL="smtp://user:pass@smtp.gmail.com:587"
-  // - or SMTP_HOST/SMTP_PORT/SMTP_SECURE/SMTP_USER/SMTP_PASS
-  const SMTP_URL = process.env.SMTP_URL;
-  const SMTP_HOST = process.env.SMTP_HOST;
-  const SMTP_PORT = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined;
-  const SMTP_SECURE = resolveBool(process.env.SMTP_SECURE, false);
-  const SMTP_USER = process.env.SMTP_USER;
-  const SMTP_PASS = process.env.SMTP_PASS;
-
-  // Back-compat envs (current code uses these)
-  const EMAIL_USER = process.env.EMAIL_USER;
-  const EMAIL_PASS = process.env.EMAIL_PASS;
-
-  const FROM = process.env.EMAIL_FROM || process.env.EMAIL_USER || process.env.SMTP_USER;
-
-  return {
-    SMTP_URL,
-    SMTP_HOST,
-    SMTP_PORT,
-    SMTP_SECURE,
-    SMTP_USER,
-    SMTP_PASS,
-    EMAIL_USER,
-    EMAIL_PASS,
-    FROM,
-  };
-};
-
-let transporter;
-const getTransporter = () => {
-  if (transporter) return transporter;
-
-  const cfg = getMailConfig();
-
-  if (cfg.SMTP_URL) {
-    transporter = nodemailer.createTransport(cfg.SMTP_URL);
-    return transporter;
-  }
-
-  if (cfg.SMTP_HOST) {
-    transporter = nodemailer.createTransport({
-      host: cfg.SMTP_HOST,
-      port: cfg.SMTP_PORT || (cfg.SMTP_SECURE ? 465 : 587),
-      secure: cfg.SMTP_SECURE,
-      auth: cfg.SMTP_USER && cfg.SMTP_PASS ? { user: cfg.SMTP_USER, pass: cfg.SMTP_PASS } : undefined,
-    });
-    return transporter;
-  }
-
-  // Fallback: Gmail "service" transport (requires an App Password if 2FA is on)
-  transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: cfg.EMAIL_USER && cfg.EMAIL_PASS ? { user: cfg.EMAIL_USER, pass: cfg.EMAIL_PASS } : undefined,
-  });
-  return transporter;
-};
-
-const assertMailEnv = () => {
-  const cfg = getMailConfig();
-
-  const hasSmtpUrl = Boolean(cfg.SMTP_URL);
-  const hasSmtpParts = Boolean(cfg.SMTP_HOST && (cfg.SMTP_USER || cfg.SMTP_PASS));
-  const hasLegacy = Boolean(cfg.EMAIL_USER && cfg.EMAIL_PASS);
-
-  if (!hasSmtpUrl && !hasSmtpParts && !hasLegacy) {
-    throw new Error(
-      'Email is not configured. Set SMTP_URL or SMTP_HOST/SMTP_USER/SMTP_PASS (recommended), or EMAIL_USER/EMAIL_PASS (legacy).'
-    );
-  }
-
-  if (!cfg.FROM) {
-    throw new Error('Email is not configured. Set EMAIL_FROM (or EMAIL_USER/SMTP_USER).');
-  }
-
-  return cfg;
-};
-
-const sendMailSafe = async (mailOptions) => {
-  const cfg = assertMailEnv();
-  const tx = getTransporter();
-  const finalMail = { ...mailOptions, from: cfg.FROM };
-  return await tx.sendMail(finalMail);
-};
+// ---------------- Resend Setup ----------------
+const resend = new Resend(process.env.RESEND_API_KEY);
 // ---------------- Generate Reset Token & Send Email ----------------
 app.post('/forgot-password', async (req, res) => {
   try {
@@ -227,14 +134,14 @@ app.post('/forgot-password', async (req, res) => {
 
     const token = crypto.randomBytes(32).toString('hex');
     user.resetToken = token;
-   user.resetTokenExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes expiry
+    user.resetTokenExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes expiry
     await user.save();
 
     const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
 
-    const mailOptions = {
-      from: process.env.EMAIL_FROM || process.env.EMAIL_USER || process.env.SMTP_USER,
-      to: username, // assuming username is email
+    await resend.emails.send({
+      from: 'Vijanaar <info@vijanaar.com>',
+      to: username,
       subject: 'Admin Dashboard Password Reset',
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6;">
@@ -243,12 +150,10 @@ app.post('/forgot-password', async (req, res) => {
           <p>Click the link below to reset your password. This link is valid for 15 Minutes only.</p>
           <p><a href="${resetLink}" style="background-color:#4CAF50;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">Reset Password</a></p>
           <p>If you did not request this, please ignore this email.</p>
-          <p>Thanks,<br/>SJ MediaLabs Team</p>
+          <p>Thanks,<br/>Vijanaar Team</p>
         </div>
       `
-    };
-
-    await sendMailSafe(mailOptions);
+    });
 
     res.status(200).json({ message: 'Reset link sent to your email' });
   } catch (error) {
@@ -887,52 +792,71 @@ app.patch("/contactuspage", verifyToken, async (req, res) => {
   }
 });
 
-app.post("/contactusform",async(req,res)=>{
-    const{ name,email,phone,message,subject}=req.body;
-    if(!name || !email || !phone || !message || !subject){
-        return res.status(400).json({error:"Please fill all the fields"});
-    }
-    try{
-        const mailOptions={
-          from: process.env.EMAIL_FROM || process.env.EMAIL_USER || process.env.SMTP_USER,
-          to: process.env.CONTACT_US_RECEIVER_EMAIL ,//where to send 
-          subject:`New Contact Us Form Submission`,
-          html: `
-            <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f9f9f9; padding: 20px;">
-              <div style="max-width: 600px; margin: auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); overflow: hidden;">
-                <div style="background: #4CAF50; color: white; padding: 15px 20px; text-align: center;">
-                  <h2 style="margin: 0; margin-top:'-5px' font-weight: 600;">📩 New Contact Form Submission</h2>
-                </div>
-                <div style="padding: 20px;">
-                  <p style="margin: 8px 0;"><strong>Name:</strong> ${name}</p>
-                  <p style="margin: 8px 0;"><strong>Email:</strong> ${email}</p>
-                  <p style="margin: 8px 0;"><strong>Phone:</strong> ${phone}</p>
-                  <p style="margin: 8px 0;"><strong>Subject:</strong> ${subject}</p>
-                  <p style="margin: 8px 0;"><strong>Message:</strong><br/> ${message}</p>
-                </div>
-                <div style="background: #f1f1f1; padding: 12px; text-align: center; font-size: 12px; color: #777;">
-                  <p style="margin: 0;">This email was sent from your website’s contact form.</p>
-                </div>
-              </div>
+app.post("/contactusform", async (req, res) => {
+  const { name, email, phone, message, subject } = req.body;
+  if (!name || !email || !phone || !message || !subject) {
+    return res.status(400).json({ error: "Please fill all the fields" });
+  }
+  try {
+    // Send form data to admin (info@vijanaar.com)
+    await resend.emails.send({
+      from: 'Vijanaar <info@vijanaar.com>',
+      to: process.env.CONTACT_US_RECEIVER_EMAIL,
+      subject: 'New Contact Us Form Submission',
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f9f9f9; padding: 20px;">
+          <div style="max-width: 600px; margin: auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); overflow: hidden;">
+            <div style="background: #4CAF50; color: white; padding: 15px 20px; text-align: center;">
+              <h2 style="margin: 0; font-weight: 600;">New Contact Form Submission</h2>
             </div>
-          `
-         }
-        if (!process.env.CONTACT_US_RECEIVER_EMAIL) {
-          return res.status(500).json({ error: "CONTACT_US_RECEIVER_EMAIL is not configured" });
-        }
-        await sendMailSafe(mailOptions);
-        return res.status(200).json({message:"Form submitted successfully"});
-    }catch(err){
-       const msg = String(err?.message || '');
-       const isAuth =
-         msg.includes('EAUTH') ||
-         msg.includes('Invalid login') ||
-         msg.includes('Username and Password not accepted') ||
-         msg.includes('535');
-       res.status(500).json({
-         error: isAuth ? 'Email service authentication failed. Check SMTP credentials/app password.' : msg,
-       });
-    }
+            <div style="padding: 20px;">
+              <p style="margin: 8px 0;"><strong>Name:</strong> ${name}</p>
+              <p style="margin: 8px 0;"><strong>Email:</strong> ${email}</p>
+              <p style="margin: 8px 0;"><strong>Phone:</strong> ${phone}</p>
+              <p style="margin: 8px 0;"><strong>Subject:</strong> ${subject}</p>
+              <p style="margin: 8px 0;"><strong>Message:</strong><br/> ${message}</p>
+            </div>
+            <div style="background: #f1f1f1; padding: 12px; text-align: center; font-size: 12px; color: #777;">
+              <p style="margin: 0;">This email was sent from your website's contact form.</p>
+            </div>
+          </div>
+        </div>
+      `
+    });
+
+    // Send thank you email to user
+    await resend.emails.send({
+      from: 'Vijanaar <info@vijanaar.com>',
+      to: email,
+      subject: 'Thank You for Contacting Vijanaar!',
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f9f9f9; padding: 20px;">
+          <div style="max-width: 600px; margin: auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); overflow: hidden;">
+            <div style="background: #4CAF50; color: white; padding: 15px 20px; text-align: center;">
+              <h2 style="margin: 0; font-weight: 600;">Thank You for Reaching Out!</h2>
+            </div>
+            <div style="padding: 20px;">
+              <p>Dear ${name},</p>
+              <p>Thank you for contacting <strong>Vijanaar</strong>. We have received your message and our team will get back to you shortly.</p>
+              <p><strong>Here is a summary of your submission:</strong></p>
+              <p style="margin: 8px 0;"><strong>Subject:</strong> ${subject}</p>
+              <p style="margin: 8px 0;"><strong>Message:</strong> ${message}</p>
+              <br/>
+              <p>Best Regards,<br/><strong>Vijanaar Team</strong></p>
+            </div>
+            <div style="background: #f1f1f1; padding: 12px; text-align: center; font-size: 12px; color: #777;">
+              <p style="margin: 0;">This is an automated response. Please do not reply to this email.</p>
+            </div>
+          </div>
+        </div>
+      `
+    });
+
+    return res.status(200).json({ message: "Form submitted successfully" });
+  } catch (err) {
+    console.error("Error sending contact form email:", err);
+    res.status(500).json({ error: err.message });
+  }
 })
 
 //-----------------------------------------------Company Details Page--------------------------------------------------------------
@@ -1265,42 +1189,67 @@ app.post("/enquiryform", async (req, res) => {
   }
 
   try {
-    const mailOptions = {
-      from: process.env.EMAIL_FROM || process.env.EMAIL_USER || process.env.SMTP_USER,
-      to: process.env.ENQUIRY_RECEIVER_EMAIL, // admin email for enquiries
-      subject: "🎓 New Course Enquiry Submission",
+    // Send enquiry data to admin
+    await resend.emails.send({
+      from: 'Vijanaar <info@vijanaar.com>',
+      to: process.env.ENQUIRY_RECEIVER_EMAIL,
+      subject: 'New Course Enquiry Submission',
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f9f9f9; padding: 20px;">
           <div style="max-width: 600px; margin: auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); overflow: hidden;">
-            
-            <!-- Header -->
             <div style="background: #007BFF; color: white; padding: 15px 20px; text-align: center;">
-              <h2 style="margin: 0; font-weight: 600;">📋 New Course Enquiry Form</h2>
+              <h2 style="margin: 0; font-weight: 600;">New Course Enquiry Form</h2>
               <p style="margin: 0; font-size: 14px;">You have received a new enquiry from your website</p>
             </div>
-
-            <!-- Body -->
             <div style="padding: 20px;">
-              <p style="margin: 8px 0;"><strong>👤 Full Name:</strong> ${fullName}</p>
-              <p style="margin: 8px 0;"><strong>📧 Email:</strong> ${email}</p>
-              <p style="margin: 8px 0;"><strong>📞 Phone:</strong> ${phone}</p>
-              <p style="margin: 8px 0;"><strong>🎓 Qualification:</strong> ${qualification}</p>
+              <p style="margin: 8px 0;"><strong>Full Name:</strong> ${fullName}</p>
+              <p style="margin: 8px 0;"><strong>Email:</strong> ${email}</p>
+              <p style="margin: 8px 0;"><strong>Phone:</strong> ${phone}</p>
+              <p style="margin: 8px 0;"><strong>Qualification:</strong> ${qualification}</p>
             </div>
-
-            <!-- Footer -->
             <div style="background: #f1f1f1; padding: 12px; text-align: center; font-size: 12px; color: #777;">
-              <p style="margin: 0;">This email was sent from your website’s <strong>Course Enquiry Form</strong>.</p>
+              <p style="margin: 0;">This email was sent from your website's <strong>Course Enquiry Form</strong>.</p>
             </div>
-
           </div>
         </div>
-      `,
-    };
+      `
+    });
 
+    // Send thank you email to user
+    await resend.emails.send({
+      from: 'Vijanaar <info@vijanaar.com>',
+      to: email,
+      subject: 'Thank You for Your Enquiry - Vijanaar',
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f9f9f9; padding: 20px;">
+          <div style="max-width: 600px; margin: auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); overflow: hidden;">
+            <div style="background: #007BFF; color: white; padding: 15px 20px; text-align: center;">
+              <h2 style="margin: 0; font-weight: 600;">Thank You for Your Enquiry!</h2>
+            </div>
+            <div style="padding: 20px;">
+              <p>Dear ${fullName},</p>
+              <p>Thank you for your interest in our courses at <strong>Vijanaar</strong>. We have received your enquiry and our team will reach out to you soon.</p>
+              <p><strong>Your submission details:</strong></p>
+              <p style="margin: 8px 0;"><strong>Qualification:</strong> ${qualification}</p>
+              <p style="margin: 8px 0;"><strong>Phone:</strong> ${phone}</p>
+              <br/>
+              <p>Best Regards,<br/><strong>Vijanaar Team</strong></p>
+            </div>
+            <div style="background: #f1f1f1; padding: 12px; text-align: center; font-size: 12px; color: #777;">
+              <p style="margin: 0;">This is an automated response. Please do not reply to this email.</p>
+            </div>
+          </div>
+        </div>
+      `
+    });
+
+<<<<<<< HEAD
     if (!process.env.ENQUIRY_RECEIVER_EMAIL) {
       return res.status(500).json({ error: "ENQUIRY_RECEIVER_EMAIL is not configured" });
     }
     await sendMailSafe(mailOptions);
+=======
+>>>>>>> 4bcc44ce2a12276727d08d5bb22c3c6c85fda9e3
     return res.status(200).json({ message: "Enquiry form submitted successfully" });
   } catch (err) {
     console.error("Error sending enquiry email:", err);
@@ -1318,49 +1267,66 @@ app.post("/enquiryform", async (req, res) => {
 app.post("/courseenquiry", async (req, res) => {
   const { name, email, mobilenumber, courseName, modeoftraining } = req.body;
 
-  // ✅ Basic validation
   if (!name || !email || !mobilenumber || !courseName || !modeoftraining) {
     return res.status(400).json({ error: "Please fill all the fields" });
   }
 
   try {
-    const mailOptions = {
-      from: process.env.EMAIL_FROM || process.env.EMAIL_USER || process.env.SMTP_USER,
-      to: process.env.ENQUIRY_RECEIVER_EMAIL, // admin email for course enquiries
-      subject: "🎓 New Course Enquiry Received",
+    // Send enquiry data to admin
+    await resend.emails.send({
+      from: 'Vijanaar <info@vijanaar.com>',
+      to: process.env.ENQUIRY_RECEIVER_EMAIL,
+      subject: 'New Course Enquiry Received',
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f9f9f9; padding: 20px;">
           <div style="max-width: 600px; margin: auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); overflow: hidden;">
-            
-            <!-- Header -->
             <div style="background: #007BFF; color: white; padding: 15px 20px; text-align: center;">
-              <h2 style="margin: 0; font-weight: 600;">📋 New Course Enquiry</h2>
+              <h2 style="margin: 0; font-weight: 600;">New Course Enquiry</h2>
               <p style="margin: 0; font-size: 14px;">A new enquiry has been submitted from your website</p>
             </div>
-
-            <!-- Body -->
             <div style="padding: 20px;">
-              <p style="margin: 8px 0;"><strong>👤 Name:</strong> ${name}</p>
-              <p style="margin: 8px 0;"><strong>📧 Email:</strong> ${email}</p>
-              <p style="margin: 8px 0;"><strong>📞 Mobile Number:</strong> ${mobilenumber}</p>
-              <p style="margin: 8px 0;"><strong>📚 Course Name:</strong> ${courseName}</p>
-              <p style="margin: 8px 0;"><strong>💻 Mode of Training:</strong> ${modeoftraining}</p>
+              <p style="margin: 8px 0;"><strong>Name:</strong> ${name}</p>
+              <p style="margin: 8px 0;"><strong>Email:</strong> ${email}</p>
+              <p style="margin: 8px 0;"><strong>Mobile Number:</strong> ${mobilenumber}</p>
+              <p style="margin: 8px 0;"><strong>Course Name:</strong> ${courseName}</p>
+              <p style="margin: 8px 0;"><strong>Mode of Training:</strong> ${modeoftraining}</p>
             </div>
-
-            <!-- Footer -->
             <div style="background: #f1f1f1; padding: 12px; text-align: center; font-size: 12px; color: #777;">
-              <p style="margin: 0;">This email was sent from your website’s <strong>Course Enquiry Form</strong>.</p>
+              <p style="margin: 0;">This email was sent from your website's <strong>Course Enquiry Form</strong>.</p>
             </div>
-
           </div>
         </div>
-      `,
-    };
+      `
+    });
 
-    if (!process.env.ENQUIRY_RECEIVER_EMAIL) {
-      return res.status(500).json({ error: "ENQUIRY_RECEIVER_EMAIL is not configured" });
-    }
-    await sendMailSafe(mailOptions);
+    // Send thank you email to user
+    await resend.emails.send({
+      from: 'Vijanaar <info@vijanaar.com>',
+      to: email,
+      subject: 'Thank You for Your Course Enquiry - Vijanaar',
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f9f9f9; padding: 20px;">
+          <div style="max-width: 600px; margin: auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); overflow: hidden;">
+            <div style="background: #007BFF; color: white; padding: 15px 20px; text-align: center;">
+              <h2 style="margin: 0; font-weight: 600;">Thank You for Your Enquiry!</h2>
+            </div>
+            <div style="padding: 20px;">
+              <p>Dear ${name},</p>
+              <p>Thank you for your interest in <strong>${courseName}</strong> at <strong>Vijanaar</strong>. We have received your enquiry and our team will contact you shortly.</p>
+              <p><strong>Your enquiry details:</strong></p>
+              <p style="margin: 8px 0;"><strong>Course:</strong> ${courseName}</p>
+              <p style="margin: 8px 0;"><strong>Mode of Training:</strong> ${modeoftraining}</p>
+              <br/>
+              <p>Best Regards,<br/><strong>Vijanaar Team</strong></p>
+            </div>
+            <div style="background: #f1f1f1; padding: 12px; text-align: center; font-size: 12px; color: #777;">
+              <p style="margin: 0;">This is an automated response. Please do not reply to this email.</p>
+            </div>
+          </div>
+        </div>
+      `
+    });
+
     return res.status(200).json({ message: "Course enquiry submitted successfully" });
   } catch (err) {
     console.error("Error sending course enquiry email:", err);
@@ -1375,8 +1341,6 @@ app.post("/courseenquiry", async (req, res) => {
     });
   }
 });
-
-
 //----------------------------------------------------Training Program Banner-----------------------------------------------------
 
 //---------------------------------------------Course Page-------------------------------------------------------------------------------------------------
